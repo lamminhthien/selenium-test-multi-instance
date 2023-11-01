@@ -1,13 +1,14 @@
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 
-
-const roomCode = "ewp8g"
+const roomCode = "e7kmc"
+const minuteWaiting = 10 * 1000 * 1000;
 
 // Function to create a new WebDriver instance for Chrome
 async function createChromeInstance () {
+  // Set up Chrome options for headless mode
   let options = new chrome.Options();
-  options.addArguments('start-maximized'); // Maximize the browser window
+  options.addArguments('--headless'); // Maximize the browser window
 
   // Create a new WebDriver instance using Chrome options
   let driver = new Builder()
@@ -24,12 +25,13 @@ async function performActions (driver) {
     // Navigate to a website
     await driver.get(`https://www.quizne.com/room/${roomCode}/multiple-play`)
     await driver.manage().window().setRect({ width: 1920, height: 993 })
+    await driver.sleep(10000);
     await driver.findElement(By.name("name")).sendKeys("a")
-    await driver.findElement(By.name("name")).sendKeys(Key.ENTER)
+    await driver.actions().sendKeys(Key.RETURN).perform();
 
   } finally {
-    // Waiting 15 second
-    await driver.sleep(15000);
+    // Waiting
+    await driver.sleep(minuteWaiting);
     // Close the browser
     await driver.quit();
   }
@@ -37,14 +39,12 @@ async function performActions (driver) {
 
 // Create and run multiple instances of Chrome concurrently
 async function main () {
-  const numberOfInstances = 2; // Change this to the number of instances you want to run
+  const numberOfInstances = 3; // Change this to the number of instances you want to run
 
   const drivers = [];
   for (let i = 0; i < numberOfInstances; i++) {
     const driver = await createChromeInstance();
     drivers.push(driver);
-
-
   }
 
   // Perform actions on each WebDriver instance concurrently
